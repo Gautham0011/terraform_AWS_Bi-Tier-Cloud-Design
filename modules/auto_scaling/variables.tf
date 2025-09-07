@@ -1,0 +1,72 @@
+variable "project_name" {
+  type        = string
+  description = "Project Name"
+
+}
+
+variable "asg_sg_id" {
+  type = string
+  description = "ASG security group id"
+  
+}
+
+variable "ami" {
+  type        = string
+  description = "AMI type for ec2 instances"
+  default     = "ami-00ca32bbc84273381"
+
+}
+
+variable "instance_type" {
+  type        = string
+  description = "ec2 instance type"
+  default     = "t3.micro"
+}
+
+variable "aws_region" {
+  type        = string
+  description = "AWS default region for reources"
+  default     = "us-east-1"
+
+}
+
+variable "min_size" {
+  type        = number
+  default     = 2
+  description = "Minimum number of EC2 instances in ASG"
+
+}
+
+variable "max_size" {
+  type        = number
+  default     = 2
+  description = "Minimum number of EC2 instances in ASG"
+
+}
+
+variable "desired_cap" {
+  type        = number
+  default     = 3
+  description = "Desired number of EC2 instances in ASG to always run"
+
+}
+
+variable "target_group_arn" {
+  type        = string
+  description = "arn of target group to backend the ASG"
+
+}
+
+variable "public_subnet_A_id" {
+
+}
+
+variable "public_subnet_B_id" {
+
+}
+
+variable "enable_autscaling" {
+  description = "If set to true, enable auto scaling"
+  type        = bool
+
+}
