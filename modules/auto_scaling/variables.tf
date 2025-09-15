@@ -5,9 +5,9 @@ variable "project_name" {
 }
 
 variable "asg_sg_id" {
-  type = string
+  type        = string
   description = "ASG security group id"
-  
+
 }
 
 variable "ami" {
@@ -68,5 +68,58 @@ variable "public_subnet_B_id" {
 variable "enable_autscaling" {
   description = "If set to true, enable auto scaling"
   type        = bool
+
+}
+
+variable "server_port" {
+  description = "https server ingress and egress ports"
+  type        = number
+  default     = 80
+}
+
+variable "server_text" {
+  description = "the text the webserver displays"
+  type        = string
+  default     = "Hello, This your HA app project setup!"
+
+}
+
+variable "db_name" {
+  type = string
+
+}
+
+variable "db_address" {
+  type = string
+
+}
+
+variable "db_port" {
+
+}
+
+variable "db_endpoint" {
+
+}
+
+variable "replica_address" {
+  type = string
+
+}
+
+variable "replica_port" {
+
+}
+
+variable "replica_name" {
+  type = string
+
+}
+
+variable "db_az" {
+
+}
+
+variable "replica_az" {
 
 }

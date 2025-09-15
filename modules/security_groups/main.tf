@@ -38,7 +38,7 @@ resource "aws_vpc_security_group_egress_rule" "allow_all_outbound" {
 # EC2 ASG security group
 resource "aws_security_group" "asg_sg" {
   name        = "${var.project_name}-asg-sg"
-  description = "Allow LB traffic ASG"
+  description = "Allow LB traffic to ASG, http only"
   vpc_id      = var.vpc_id
 
   ingress {
