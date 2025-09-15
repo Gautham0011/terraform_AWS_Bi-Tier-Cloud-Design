@@ -3,36 +3,51 @@ resource "aws_launch_template" "launch_template" {
   name          = "${var.project_name}-template"
   image_id      = var.ami
   instance_type = var.instance_type
-  key_name      = "test"
+
+  #this public key pair must be created manually on the AWS UI and you need to download the private key to you local machine to use it to ssh to the ec2 instances
+  key_name = "test"
 
   block_device_mappings {
     device_name = "/dev/sdd"
 
     ebs {
-      volume_type = "gp3"
-      volume_size = 8
+      volume_type           = "gp3"
+      volume_size           = 8
       delete_on_termination = true
     }
   }
 
-    # user_data = base64encode(templatefile("${path.module}/user_data.sh", {
-    #                           server_port = var.server_port
-    #                           db_address = data.terraform_remote_state.db.outputs.address
-    #                           db_port = data.terraform_remote_state.db.outputs.port
-    #                           server_text = var.server_text
-    #                           }))
+  user_data = base64encode(templatefile("${path.module}/user_data.sh", {
+    server_port = var.server_port
+    db_name     = var.db_name
+    #db_address = var.db_address
+    db_endpoint     = var.db_endpoint
+    db_port         = var.db_port
+    db_az           = var.db_az
+    replica_name    = var.replica_name
+    replica_address = var.replica_address
+    replica_port    = var.replica_port
+    replica_az      = var.replica_az
+    #server_text = var.server_text
+  }))
 
-      user_data = base64encode(<<-EOF
-              #!/bin/bash
-              yum install -y httpd
-              systemctl enable httpd
-              systemctl start httpd
+  # user_data = base64encode(<<-EOF
+  #         #!/bin/bash
+  #         yum install -y httpd
+  #         systemctl enable httpd
+  #         systemctl start httpd
 
-              echo "Hello from $(hostname)" > /var/www/html/index.html
-              EOF
-  )
+  #         echo "Hello from $(hostname)" > /var/www/html/index.html
+  #         EOF
+  #)
 
   vpc_security_group_ids = [var.asg_sg_id]
+
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "optional"
+    http_put_response_hop_limit = 10
+  }
 
   lifecycle {
     create_before_destroy = true

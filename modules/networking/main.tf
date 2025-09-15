@@ -90,9 +90,9 @@ resource "aws_route_table_association" "attach_route_subnetB" {
 
 # Create private subnet
 resource "aws_subnet" "private_subnetA" {
-  vpc_id                          = aws_vpc.vpc.id
-  cidr_block                      = var.private_subnet_A
-  availability_zone               = local.az1
+  vpc_id            = aws_vpc.vpc.id
+  cidr_block        = var.private_subnet_A
+  availability_zone = local.az1
   #map_customer_owned_ip_on_launch = false
 
   tags = {
@@ -102,9 +102,9 @@ resource "aws_subnet" "private_subnetA" {
 }
 
 resource "aws_subnet" "private_subnetB" {
-  vpc_id                          = aws_vpc.vpc.id
-  cidr_block                      = var.private_subnet_B
-  availability_zone               = local.az2
+  vpc_id            = aws_vpc.vpc.id
+  cidr_block        = var.private_subnet_B
+  availability_zone = local.az2
   #map_customer_owned_ip_on_launch = false
 
   tags = {

@@ -16,7 +16,7 @@ resource "aws_db_instance" "rds_db" {
   storage_type            = "gp2"
   instance_class          = "db.t3.micro"
   skip_final_snapshot     = true
-  backup_retention_period = 0
+  backup_retention_period = 7
   db_name                 = var.db_name
 
   storage_encrypted   = false
@@ -38,12 +38,15 @@ resource "aws_db_instance" "rds_replica" {
   identifier          = "replica-instance"
   allocated_storage   = 20
   skip_final_snapshot = true
+  #backup_retention_period = 7
 
   storage_encrypted   = false
   publicly_accessible = false
 
   multi_az          = false
   availability_zone = data.aws_availability_zones.available.names[1]
+
+  depends_on = [aws_db_instance.rds_db]
 
   tags = {
     Name = "${var.project_name}-rds-replica"
