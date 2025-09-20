@@ -12,9 +12,9 @@ This project implements a bi-tier architecture on AWS featuring:
 - **Security**: Security groups for each of the AWS components created
 - **High Availability**: Multi-AZ deployment with automated failover
 
-![Web Server Status - AZ 1a](<img width="1901" height="1045" alt="Image" src="https://github.com/user-attachments/assets/a481f342-a374-47b0-bfa5-8370af0cd207" />)
+![Web Server Status - AZ 1a!](<img width="1901" height="1045" alt="Image" src="https://github.com/user-attachments/assets/a481f342-a374-47b0-bfa5-8370af0cd207" />)
 
-![Web Server Status - AZ 1b](<img width="1902" height="1059" alt="Image" src="https://github.com/user-attachments/assets/a3691176-c854-4420-8313-52835c26dce9" />)
+![Web Server Status - AZ 1b!](<img width="1902" height="1059" alt="Image" src="https://github.com/user-attachments/assets/a3691176-c854-4420-8313-52835c26dce9" />)
 
 ## Key Components
 
