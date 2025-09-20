@@ -9,14 +9,14 @@ This project implements a bi-tier architecture on AWS featuring:
 - **Presentation Tier**: Auto Scaling Group with Application Load Balancer
 - **Data Tier**: Amazon RDS MySQL database with Multi-AZ deployment
 - **Networking**: Custom VPC with public/private subnets across multiple AZs
-- **Security**: Security groups, NACLs, and proper IAM roles
+- **Security**: Security groups for each of the AWS components created
 - **High Availability**: Multi-AZ deployment with automated failover
 
-![Web Server Status - Instance 1](images/server-status-1.png)
-*Web Server Status showing Primary Database connection*
+![Web Server Status - Instance 1](<img width="1901" height="1045" alt="Image" src="https://github.com/user-attachments/assets/a481f342-a374-47b0-bfa5-8370af0cd207" />)
+*EC2 from AZ 1a*
 
-![Web Server Status - Instance 2](images/server-status-2.png)
-*Web Server Status showing Replica Database in different AZ*
+![Web Server Status - Instance 2](<img width="1902" height="1059" alt="Image" src="https://github.com/user-attachments/assets/a3691176-c854-4420-8313-52835c26dce9" />)
+*EC2 from AZ 1b*
 
 ## Key Components
 
@@ -44,7 +44,7 @@ This project implements a bi-tier architecture on AWS featuring:
 
 - **Steps Based on operating system**: [Terraform Installation](https://developer.hashicorp.com/terraform/install)
 
-**Official Documentation**: [Install Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)
+[Official Documentation](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)
 
 ### 2. AWS CLI Configuration
 Configure AWS credentials:
