@@ -58,7 +58,7 @@ aws configure
 5. Use as follows if you need to ssh (NOTE - Additionally need to allow inbound connectivity from your local IP in Private Security group for port 22)
 
 ```hcl
-❯ ssh -i <path to you secret kry> ec2-user@<public IP>
+❯ ssh -i <path to you secret key> ec2-user@<public IP>
 ```
 
 **Note**: SSH access is not mandatory for this setup but recommended for troubleshooting.
