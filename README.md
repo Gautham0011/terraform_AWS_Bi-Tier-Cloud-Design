@@ -1,12 +1,10 @@
-# terraform_AWS_Bi-Tier-Cloud-Design
-
 # Terraform AWS Bi-Tier Cloud Design
 
-A scalable and secure bi-tier web application architecture deployed on AWS using Terraform Infrastructure as Code (IaC).
+A scalable and Highly available bi-tier web application architecture deployed on AWS using Terraform.
 
 ## Architecture Overview
 
-This project implements a robust bi-tier architecture on AWS featuring:
+This project implements a bi-tier architecture on AWS featuring:
 
 - **Presentation Tier**: Auto Scaling Group with Application Load Balancer
 - **Data Tier**: Amazon RDS MySQL database with Multi-AZ deployment
@@ -26,7 +24,6 @@ This project implements a robust bi-tier architecture on AWS featuring:
 - **VPC**: Custom Virtual Private Cloud with CIDR block
 - **Subnets**: Public and private subnets across multiple Availability Zones
 - **Internet Gateway**: For internet access to public subnets
-- **NAT Gateway**: For outbound internet access from private subnets
 - **Route Tables**: Proper routing configuration
 
 ### Compute
@@ -39,25 +36,13 @@ This project implements a robust bi-tier architecture on AWS featuring:
 - **Amazon RDS**: MySQL database with Multi-AZ deployment
 - **DB Subnet Group**: Spans multiple AZs for high availability
 - **Automated Backups**: Point-in-time recovery enabled
-- **Read Replica**: For improved read performance (if configured)
+- **Replica**: For improved HA
 
 ## Prerequisites
 
 ### 1. Install Terraform
-Choose your operating system and follow the installation guide:
 
-- **Windows**: [Terraform Windows Installation](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli#install-terraform)
-- **macOS**: 
-  ```bash
-  brew tap hashicorp/tap
-  brew install hashicorp/tap/terraform
-  ```
-- **Linux (Ubuntu/Debian)**:
-  ```bash
-  wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-  echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-  sudo apt update && sudo apt install terraform
-  ```
+- **Steps Based on operating system**: [Terraform Installation](https://developer.hashicorp.com/terraform/install)
 
 **Official Documentation**: [Install Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)
 
@@ -72,6 +57,11 @@ aws configure
 2. Create a new key pair
 3. Download the private key file (.pem)
 4. Store it securely (needed for SSH access to EC2 instances if required)
+5. Use as follows if you need to ssh (NOTE - Additionally need to allow inbound connectivity from your local IP in Private Security group for port 22)
+
+```hcl
+❯ ssh -i <path to you secret kry> ec2-user@<public IP>
+```
 
 **Note**: SSH access is not mandatory for this setup but recommended for troubleshooting.
 
@@ -102,14 +92,13 @@ terraform apply
 This creates:
 - S3 bucket for state storage
 - DynamoDB table for state locking
-- Proper IAM policies
 
 ### Step 2: Deploy Main Infrastructure
 
 Navigate back to the main project directory and deploy the bi-tier architecture:
 
 ```bash
-cd ../
+cd ../setup/
 terraform init
 terraform plan -var-file="secret.tfvars"
 terraform apply -var-file="secret.tfvars"
@@ -128,7 +117,7 @@ After successful deployment:
 
 1. **Get the Load Balancer URL**: 
    - Check the Terraform output for `ELB_DNS`
-   - Example output: `elb-dns = "my-alb-1234567890.us-east-1.elb.amazonaws.com"`
+   - Example output: `elb-dns = "dual-tier-project-alb-736273417.us-east-1.elb.amazonaws.com/"`
 
 2. **Access the Application**:
    - Open your web browser
@@ -144,7 +133,7 @@ terraform init
 terraform apply
 
 # Step 2: Deploy main infrastructure
-cd ../
+cd ../setup
 terraform init
 terraform plan -var-file="secret.tfvars"
 terraform apply -var-file="secret.tfvars"
@@ -155,33 +144,15 @@ terraform apply -var-file="secret.tfvars"
 
 ## Infrastructure Components Details
 
-### Auto Scaling Configuration
-- **Min Size**: 2 instances
-- **Max Size**: 6 instances
-- **Desired Capacity**: 2 instances
-- **Health Check Type**: ELB
-- **Health Check Grace Period**: 300 seconds
+### Module Configuration
 
-### Database Configuration
-- **Engine**: MySQL 8.0
-- **Instance Class**: db.t3.micro (free tier eligible)
-- **Multi-AZ**: Enabled for high availability
-- **Backup Retention**: 7 days
-- **Storage**: 20 GB GP2 with auto-scaling enabled
+- **Auto Scaling Group**: ASG with autoscalaing facility based on traffic peak hours
+- **Load Balancer**: Backend public traffic to ASG
+- **Networking**: Setup AWS VPC for the bi-tier project
+- **Security Groups**: Security groups with minimal required access
+- **Database**: HA MySQL DB setup from two subnets of the same region but different AZ
 
-### Security Features
-- Security groups with minimal required access
-- Database in private subnets only
-- Web servers in public subnets behind load balancer
-- Network ACLs for additional security layer
 
-## Monitoring and Maintenance
-
-The deployed infrastructure includes:
-- CloudWatch monitoring for all resources
-- Auto Scaling policies based on CPU utilization
-- Load balancer health checks
-- RDS automated backups
 
 ## Cleanup Instructions
 
@@ -189,6 +160,7 @@ The deployed infrastructure includes:
 
 ### Step 1: Destroy Main Infrastructure
 ```bash
+cd setup/
 terraform destroy -var-file="secret.tfvars"
 ```
 
@@ -204,26 +176,24 @@ terraform destroy
 
 1. **Permission Errors**: Ensure your AWS credentials have necessary permissions for EC2, RDS, VPC, and IAM operations.
 
-2. **Resource Limits**: Check your AWS service quotas if resources fail to create.
+2. **Resource Limits**: Check your AWS service quotas (in case of free account) if resources fail to create.
 
 3. **Database Connection Issues**: Verify security group rules allow communication between web servers and database.
 
 4. **Load Balancer Health Checks**: Ensure your web application responds correctly to health check requests.
+
+5. export required AWS creds before beggining the terraform actions like
+```bash
+export AWS_ACCESS_KEY_ID=<key_id> && 
+export AWS_SECRET_ACCESS_KEY=<secret> && 
+export AWS_DEFAULT_REGION=us-east-1
+```
 
 ### SSH Access (If Needed)
 If you need to troubleshoot EC2 instances:
 ```bash
 ssh -i /path/to/your-key.pem ec2-user@[instance-public-ip]
 ```
-
-## Cost Considerations
-
-This infrastructure uses several AWS resources that may incur costs:
-- EC2 instances (t3.micro eligible for free tier)
-- RDS database (db.t3.micro eligible for free tier)
-- Application Load Balancer (~$22/month)
-- NAT Gateway (~$45/month)
-- Data transfer charges
 
 **Tip**: Use AWS Cost Explorer and set up billing alerts to monitor your usage.
 
@@ -256,49 +226,50 @@ RDS MySQL (Multi-AZ)
 ## File Structure
 
 ```
-terraform_AWS_Bi-Tier-Cloud-Design/
+❯ tree two_tier
+two_tier
+├── modules
+│   ├── auto_scaling
+│   │   ├── main.tf
+│   │   ├── output.tf
+│   │   ├── user_data.sh
+│   │   └── variables.tf
+│   ├── database
+│   │   ├── main.tf
+│   │   ├── output.tf
+│   │   └── variables.tf
+│   ├── load_balancer
+│   │   ├── main.tf
+│   │   ├── output.tf
+│   │   └── variables.tf
+│   ├── networking
+│   │   ├── main.tf
+│   │   ├── output.tf
+│   │   └── variables.tf
+│   └── security_groups
+│       ├── main.tf
+│       ├── output.tf
+│       └── variables.tf
 ├── README.md
-├── main.tf
-├── variables.tf
-├── outputs.tf
-├── secret.tfvars (create this)
-├── remote-backend/
-│   ├── main.tf
-│   ├── variables.tf
-│   └── outputs.tf
-└── images/
-    ├── server-status-1.png
-    └── server-status-2.png
+├── remote_backend_infra
+│   ├── main.tf
+│   ├── output.tf
+│   ├── provider.tf
+│   ├── terraform.tfstate
+│   ├── terraform.tfstate.backup
+│   └── variables.tf
+├── setup
+│   ├── backend.tf
+│   ├── main.tf
+│   ├── output.tf
+│   ├── provider.tf
+│   ├── terraform.tfvars
+│   └── variables.tf
+|   └── secret.tfvars (create this)
+└── terraform.tfstate
+
+9 directories, 30 files
 ```
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## Security Best Practices
-
-- Regularly update AMIs and apply security patches
-- Use AWS Systems Manager Session Manager instead of SSH when possible
-- Implement proper IAM roles and policies
-- Enable AWS CloudTrail for audit logging
-- Use AWS Config for compliance monitoring
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Support
-
-For issues and questions:
-1. Check the troubleshooting section
-2. Review AWS documentation
-3. Open an issue in this repository
-4. Consult AWS support if needed
-
 ---
 
 **⚠️ Important Reminders**:
